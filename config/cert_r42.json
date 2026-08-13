@@ -1,0 +1,70 @@
+{
+  "study_name": "cert-r42-slow-memory-drift",
+  "model_seeds": [17, 29, 43, 59, 71],
+  "dataset": {
+    "name": "CERT r4.2",
+    "raw_root": "../../memfreezing_discrimination/data/raw/r4.2",
+    "answers_root": "../../memfreezing_discrimination/data/answers/answers",
+    "target_user": "BBS0039",
+    "target_scenario": 3,
+    "peer_count": 60,
+    "per_user_day_type_cap": 24,
+    "train_event_cap": 260000,
+    "validation_days": 7,
+    "conditioning_context_days": 14,
+    "post_payoff_hours": 36
+  },
+  "model": {
+    "memory_dim": 64,
+    "time_dim": 32,
+    "embedding_dim": 64,
+    "neighbor_size": 16,
+    "batch_size": 512,
+    "epochs": 12,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.0,
+    "gradient_clip": 5.0,
+    "early_stopping_patience": 3,
+    "baseline": "plain",
+    "memory_noise_epsilon": 0.05,
+    "lipschitz_weight": 0.0,
+    "guard_temperature": 0.0,
+    "memory_decay_beta": 0.0
+  },
+  "attack": {
+    "durations_days": [3, 7, 14],
+    "interactions_per_day": [1, 3, 5, 10],
+    "target_counts": [1],
+    "beam_width": 3,
+    "candidate_pool_size": 12,
+    "stealth_quantile": 0.99,
+    "role_penalty_weight": 0.1,
+    "step_penalty_weight": 0.05,
+    "payoff_weight": 1.0,
+    "planning_horizon_events": 0
+  },
+  "defense": {
+    "shrinkage_kappa": 8.0,
+    "ema_alpha": 0.2,
+    "cusum_allowance_quantile": 0.75,
+    "alert_quantile": 0.99,
+    "minimum_role_peers": 3,
+    "weights": {
+      "role_displacement": 1.0,
+      "innovation": 1.0,
+      "directional_persistence": 1.0,
+      "event_surprise": 0.5
+    }
+  },
+  "evaluation": {
+    "bootstrap_samples": 2000,
+    "false_alert_unit": "entity-day",
+    "primary_metric": "paired payoff anomaly change",
+    "report_seed_level_results": true
+  },
+  "paths": {
+    "prepared": "../data/prepared",
+    "checkpoints": "../checkpoints",
+    "artifacts": "../artifacts"
+  }
+}

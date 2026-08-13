@@ -1,0 +1,48 @@
+{
+  "study_name": "streamspot-kairos-comparability",
+  "model_seeds": [17, 29, 43, 59, 71],
+  "dataset": {
+    "name": "Manzoor et al. StreamSpot ALL",
+    "scope": "all_600_graphs",
+    "evaluation_unit": "graph",
+    "split_source": "KAIROS released artifact"
+  },
+  "model": {
+    "architecture": "kairos_streamspot_released_tgn",
+    "device": "cpu",
+    "node_feature_dim": 8,
+    "memory_dim": 200,
+    "time_dim": 200,
+    "embedding_dim": 200,
+    "embedding_layers": 1,
+    "attention_heads": 2,
+    "neighbor_size": 5,
+    "batch_size": 1024,
+    "epochs": 10,
+    "checkpoint_selection": "final_epoch",
+    "learning_rate": 0.0001,
+    "optimizer_epsilon": 1e-8,
+    "weight_decay": 0.0,
+    "gradient_clip": 5.0,
+    "early_stopping_patience": 10,
+    "edge_type_loss_weight": 0.0,
+    "link_loss_weight": 1.0,
+    "decoder_dropout": 0.0,
+    "baseline": "plain",
+    "memory_noise_epsilon": 0.05,
+    "lipschitz_weight": 0.0,
+    "guard_temperature": 0.0,
+    "memory_decay_beta": 0.0
+  },
+  "evaluation": {
+    "threshold": "maximum validation graph reconstruction loss",
+    "primary_metrics": ["TP", "TN", "FP", "FN", "precision", "recall", "accuracy", "auc_hard_kairos"],
+    "also_report": ["f1", "roc_auc_continuous"],
+    "kairos_reference": {"TP": 100, "TN": 375, "FP": 0, "FN": 0, "precision": 1.0, "recall": 1.0, "accuracy": 1.0, "AUC": 1.0}
+  },
+  "paths": {
+    "prepared": "../data/training_ready/streamspot",
+    "checkpoints": "../checkpoints/streamspot_kairos",
+    "artifacts": "../artifacts/streamspot_kairos"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "_path_aliases": {
+    "../../memfreezing_discrimination/data/raw/r4.2": "../../../repo/memfreezing_discrimination/data/raw/r4.2",
+    "../../memfreezing_discrimination/data/answers/answers": "../../../repo/memfreezing_discrimination/data/answers/answers",
+    "../data/training_ready/cert_r42_longitudinal": "../../data/training_ready/cert_r42_longitudinal",
+    "../checkpoints/cert_r42_longitudinal_kairos": "../checkpoints",
+    "../artifacts/cert_r42_longitudinal_kairos": "../../artifacts/cert_r42_longitudinal_kairos"
+  },
+  "study_name": "cert-r42-longitudinal-kairos-drift-defense",
+  "model_seeds": [17, 29, 43, 59, 71],
+  "dataset": {
+    "name": "CERT r4.2",
+    "scope": "full_longitudinal_all_incidents",
+    "raw_root": "../../memfreezing_discrimination/data/raw/r4.2",
+    "answers_root": "../../memfreezing_discrimination/data/answers/answers",
+    "read_chunk_rows": 200000,
+    "validation_days": 7,
+    "conditioning_context_days": 14,
+    "behavior_role_clusters": 20,
+    "behavior_role_seed": 2026
+  },
+  "model": {
+    "architecture": "adapted_released_kairos_tgn",
+    "adaptation": "CERT endpoint semantics and seven CERT event classes",
+    "node_feature_dim": 16,
+    "memory_dim": 100,
+    "time_dim": 100,
+    "embedding_dim": 100,
+    "attention_heads": 8,
+    "embedding_layers": 2,
+    "kairos_attention_layout": true,
+    "neighbor_size": 20,
+    "batch_size": 1024,
+    "epochs": 6,
+    "learning_rate": 0.00005,
+    "optimizer_epsilon": 1e-8,
+    "weight_decay": 0.01,
+    "gradient_clip": 1000000000.0,
+    "early_stopping_patience": 2,
+    "early_stopping_min_delta": 0.0005,
+    "checkpoint_selection": "best_validation",
+    "mixed_precision": true,
+    "mixed_precision_dtype": "bfloat16",
+    "batch_throttle_ms": 5.0,
+    "gpu_memory_fraction": 0.70,
+    "progress_every_partitions": 25,
+    "edge_type_loss_weight": 1.0,
+    "link_loss_weight": 0.0,
+    "decoder_dropout": 0.5,
+    "baseline": "plain",
+    "guard_temperature": 0.0,
+    "memory_decay_beta": 0.0
+  },
+  "development_cases": [
+    "s3:CSC0217", "s3:GTD0219", "s3:JGT0221", "s3:JTM0223", "s3:BBS0039"
+  ],
+  "test_cases": [
+    "s3:BSS0369", "s3:CCA0046", "s3:MPM0220", "s3:MSO0222", "s3:JLM0364"
+  ],
+  "attack": {
+    "sentinel_case": "s3:BBS0039",
+    "durations_days": [3, 7, 14],
+    "interactions_per_day": [1, 3, 5, 10],
+    "beam_width": 3,
+    "candidate_pool_size": 12,
+    "stealth_quantile": 0.99,
+    "role_penalty_weight": 0.1,
+    "step_penalty_weight": 0.05,
+    "payoff_weight": 1.0
+  },
+  "defense": {
+    "primary_role": "hierarchical_ldap",
+    "primary_reference": "median_shrinkage",
+    "primary_distance": "cosine",
+    "primary_formula": "weighted_mean_positive_z",
+    "primary_monitor": "cusum",
+    "shrinkage_kappa": 8.0,
+    "minimum_role_peers": 3,
+    "ema_alpha": 0.2,
+    "cusum_allowance_quantile": 0.75,
+    "alert_quantile": 0.99,
+    "weights": {
+      "role_displacement": 0.20,
+      "innovation": 0.20,
+      "directional_persistence": 0.15,
+      "trajectory_coherence": 0.20,
+      "event_surprise": 0.25
+    },
+    "ablation": {
+      "roles": ["global", "ldap_broad", "ldap_fine", "behavior", "hybrid", "hierarchical_ldap"],
+      "references": ["mean", "trimmed_mean", "median_shrinkage"],
+      "distances": ["cosine", "normalized_euclidean", "diagonal_mahalanobis"],
+      "formulas": ["weighted_mean_positive_z", "max_positive_z", "l2_positive_z"],
+      "monitors": ["shewhart", "ema", "cusum"]
+    }
+  },
+  "evaluation": {
+    "window_minutes": 15,
+    "benign_match_days": 14,
+    "bootstrap_samples": 2000,
+    "primary_unit": "incident",
+    "false_alert_unit": "entity-day",
+    "selection_rule": "configuration selected on clean validation false-alert burden only; attack labels reserved for evaluation",
+    "report_seed_level_results": true
+  },
+  "paths": {
+    "prepared": "../data/training_ready/cert_r42_longitudinal",
+    "checkpoints": "../checkpoints/cert_r42_longitudinal_kairos",
+    "artifacts": "../artifacts/cert_r42_longitudinal_kairos"
+  }
+}

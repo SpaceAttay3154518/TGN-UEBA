@@ -1,0 +1,55 @@
+{
+  "protocol_version": 1,
+  "model_seeds": [17, 29, 43, 59, 71],
+  "development_cases": [
+    "s3:CSC0217",
+    "s3:GTD0219",
+    "s3:JGT0221",
+    "s3:JTM0223",
+    "s3:BBS0039"
+  ],
+  "test_cases": [
+    "s3:BSS0369",
+    "s3:CCA0046",
+    "s3:MPM0220",
+    "s3:MSO0222",
+    "s3:JLM0364"
+  ],
+  "attacks": {
+    "families": [
+      "role_common",
+      "role_diverse",
+      "payoff_type_matched",
+      "greedy_payoff"
+    ],
+    "durations_days": [3, 7, 14],
+    "interactions_per_day": [1, 3, 5, 10],
+    "candidate_pool_size": 12,
+    "beam_width": 3,
+    "stealth_quantile": 0.99
+  },
+  "defense_grid": {
+    "roles": [
+      "personal_anchor",
+      "ldap_broad",
+      "ldap_fine",
+      "behavior",
+      "hybrid",
+      "hierarchical_ldap"
+    ],
+    "references": ["mean", "trimmed_mean", "median_shrinkage"],
+    "distances": ["cosine", "normalized_euclidean", "diagonal_mahalanobis"],
+    "formulas": ["single_distance", "weighted_mean_positive_z", "max_positive_z", "l2_positive_z"],
+    "monitors": ["shewhart", "ema", "cusum"],
+    "alert_quantiles": [0.99, 0.995, 0.999, 0.9995],
+    "ema_alphas": [0.1, 0.2, 0.4],
+    "cusum_allowance_quantiles": [0.5, 0.75, 0.9]
+  },
+  "selection": {
+    "maximum_observed_clean_rate_ratio": 1.0,
+    "maximum_one_sided_rate_difference": 0.001,
+    "confidence": 0.95,
+    "bootstrap_samples": 5000,
+    "cluster_unit": "incident"
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "purpose": "Dataset and evaluation registry for EMDD, the GIDS state-of-the-art evaluation, and KAIROS-comparable experiments.",
+  "training_ready_root": "../data/training_ready",
+  "suites": {
+    "emdd_primary": [
+      "cert_r42"
+    ],
+    "gids_state_of_art_evaluated": [
+      "lanl_comprehensive",
+      "optc",
+      "cicids2017",
+      "enterprise_private"
+    ],
+    "kairos_comparability": [
+      "streamspot",
+      "darpa_e3_theia",
+      "darpa_e3_cadets",
+      "darpa_e3_clearscope",
+      "darpa_e5_theia",
+      "darpa_e5_cadets",
+      "darpa_e5_clearscope",
+      "optc"
+    ],
+    "surveyed_not_evaluated": [
+      "uci_messages",
+      "digg",
+      "arxiv_hep_th",
+      "dblp",
+      "ctu13",
+      "ton_iot",
+      "nf_unsw_nb15_v2",
+      "nf_cse_cic_ids2018_v2",
+      "nf_ton_iot",
+      "bot_iot",
+      "nf_bot_iot",
+      "pivoting",
+      "cora",
+      "citeseer",
+      "pubmed"
+    ]
+  },
+  "normalized_event_contract": {
+    "required_columns": [
+      "event_id",
+      "timestamp",
+      "timestamp_s",
+      "src_id",
+      "dst_id",
+      "src_type",
+      "dst_type",
+      "event_type",
+      "event_type_id",
+      "dst_type_id",
+      "attack_label",
+      "split"
+    ],
+    "storage": "partitioned Parquet, split then chronological partition",
+    "label_granularities": [
+      "edge",
+      "15-minute-window",
+      "graph"
+    ],
+    "leakage_rule": "training and validation decisions must not use test labels or test scores"
+  },
+  "datasets": {
+    "cert_r42": {
+      "display_name": "CERT Insider Threat Test Dataset r4.2",
+      "status": "ready",
+      "adapter": "cert_full",
+      "benchmark_role": "EMDD primary slow-memory-drift corpus",
+      "raw_required": [],
+      "prepared_directory": "cert_r42",
+      "label_granularity": "edge",
+      "role_source": "explicit LDAP organizational hierarchy",
+      "public": true,
+      "source_url": "https://kilthub.cmu.edu/articles/dataset/Insider_Threat_Test_Dataset/12841247"
+    },
+    "lanl_comprehensive": {
+      "display_name": "LANL Comprehensive, Multi-Source Cyber-Security Events",
+      "status": "raw_required",
+      "adapter": "lanl",
+      "benchmark_role": "public dataset actually evaluated by the GIDS state-of-the-art paper",
+      "raw_required": [
+        "auth.txt.gz",
+        "proc.txt.gz",
+        "flows.txt.gz",
+        "dns.txt.gz",
+        "redteam.txt.gz"
+      ],
+      "prepared_directory": "lanl_comprehensive",
+      "published_events": 1648275307,
+      "gids_preprocessed_events": 1051430459,
+      "published_compressed_size_gb": 10.7,
+      "duration_days": 58,
+      "label_granularity": "edge",
+      "role_source": "structural proxy only; no employee-role directory is released",
+      "public": true,
+      "source_url": "https://csr.lanl.gov/data/cyber1/",
+      "split_policy": "train before first red-team event; reserve the final benign pre-attack day for validation; test from first red-team event onward"
+    },
+    "cicids2017": {
+      "display_name": "CIC-IDS-2017 Generated Labelled Flows",
+      "status": "raw_required",
+      "adapter": "cicids2017",
+      "benchmark_role": "public dataset actually evaluated by the GIDS state-of-the-art paper",
+      "raw_required": [
+        "GeneratedLabelledFlows.zip"
+      ],
+      "prepared_directory": "cicids2017",
+      "published_events": 2830742,
+      "published_hosts_or_ips": 19129,
+      "duration_days": 5,
+      "label_granularity": "edge",
+      "role_source": "network service-role proxy only; no organizational roles are released",
+      "public": true,
+      "source_url": "https://www.unb.ca/cic/datasets/ids-2017.html",
+      "split_policy": "Monday benign traffic is temporally split into train then validation; Tuesday-Friday are test",
+      "scientific_constraint": "Use GeneratedLabelledFlows, not MachineLearningCSV: graph construction requires source IP, destination IP, and timestamp."
+    },
+    "enterprise_private": {
+      "display_name": "Anonymous enterprise dataset from the GIDS state-of-the-art study",
+      "status": "unavailable_private",
+      "adapter": null,
+      "benchmark_role": "private dataset actually evaluated by the GIDS state-of-the-art paper",
+      "raw_required": [],
+      "prepared_directory": "enterprise_private",
+      "published_events": 10338002425,
+      "published_hosts_or_ips": 18425098,
+      "duration_days": 101,
+      "label_granularity": "edge",
+      "role_source": "not disclosed",
+      "public": false,
+      "source_url": null,
+      "blocker": "The paper describes an anonymous newly collected enterprise corpus but provides no public data release."
+    },
+    "streamspot": {
+      "display_name": "Manzoor et al. StreamSpot ALL",
+      "status": "acquirable",
+      "adapter": "streamspot",
+      "benchmark_role": "KAIROS graph-level comparability dataset",
+      "raw_required": [
+        "all.tar.gz"
+      ],
+      "prepared_directory": "streamspot",
+      "graphs": 600,
+      "attack_graphs": 100,
+      "label_granularity": "graph",
+      "role_source": "kernel-object type only",
+      "public": true,
+      "source_url": "https://github.com/sbustreamspot/sbustreamspot-data",
+      "source_revision": "07942da41ae3ba7202b146c758fcf0c30d2cb7b6",
+      "split_policy": "KAIROS: graph 0 of each benign scenario for train, graphs 1-24 for validation, graphs 25-99 for test, and all attack graphs 300-399 for test"
+    },
+    "darpa_e3_theia": {
+      "display_name": "DARPA TC Engagement 3 - THEIA",
+      "status": "raw_required",
+      "adapter": "darpa_cdm18",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e3_theia",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing/blob/master/README-E3.md",
+      "dates": {"train": ["2018-04-03", "2018-04-04", "2018-04-05"], "validation": ["2018-04-09"], "test": ["2018-04-10", "2018-04-11", "2018-04-12"]}
+    },
+    "darpa_e3_cadets": {
+      "display_name": "DARPA TC Engagement 3 - CADETS",
+      "status": "raw_required",
+      "adapter": "darpa_cdm18",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e3_cadets",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing/blob/master/README-E3.md",
+      "dates": {"train": ["2018-04-02", "2018-04-03", "2018-04-04"], "validation": ["2018-04-05"], "test": ["2018-04-06", "2018-04-07"]}
+    },
+    "darpa_e3_clearscope": {
+      "display_name": "DARPA TC Engagement 3 - ClearScope",
+      "status": "raw_required",
+      "adapter": "darpa_cdm18",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e3_clearscope",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing/blob/master/README-E3.md",
+      "dates": {"train": ["2018-04-04", "2018-04-05", "2018-04-06"], "validation": ["2018-04-07"], "test": ["2018-04-10", "2018-04-11"]}
+    },
+    "darpa_e5_theia": {
+      "display_name": "DARPA TC Engagement 5 - THEIA",
+      "status": "raw_required",
+      "adapter": "darpa_cdm20",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e5_theia",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing",
+      "dates": {"train": ["2019-05-08", "2019-05-09"], "validation": ["2019-05-11"], "test": ["2019-05-14", "2019-05-15"]}
+    },
+    "darpa_e5_cadets": {
+      "display_name": "DARPA TC Engagement 5 - CADETS",
+      "status": "raw_required",
+      "adapter": "darpa_cdm20",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e5_cadets",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing",
+      "dates": {"train": ["2019-05-08", "2019-05-09", "2019-05-11"], "validation": ["2019-05-12"], "test": ["2019-05-15", "2019-05-16", "2019-05-17"]}
+    },
+    "darpa_e5_clearscope": {
+      "display_name": "DARPA TC Engagement 5 - ClearScope",
+      "status": "raw_required",
+      "adapter": "darpa_cdm20",
+      "benchmark_role": "KAIROS provenance benchmark",
+      "raw_required": ["*.json", "ground_truth.json"],
+      "prepared_directory": "darpa_e5_clearscope",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/darpa-i2o/Transparent-Computing",
+      "dates": {"train": ["2019-05-08", "2019-05-09", "2019-05-11"], "validation": ["2019-05-12"], "test": ["2019-05-14", "2019-05-15", "2019-05-17"]}
+    },
+    "optc": {
+      "display_name": "DARPA Operationally Transparent Cyber (OpTC)",
+      "status": "external_storage_required",
+      "adapter": "optc_ecar",
+      "benchmark_role": "both GIDS state-of-the-art evaluation and KAIROS provenance benchmark",
+      "raw_required": ["ecar/**/*.json", "ground_truth.json"],
+      "prepared_directory": "optc",
+      "label_granularity": "15-minute-window",
+      "role_source": "kernel-object type and hierarchical path",
+      "public": true,
+      "source_url": "https://github.com/FiveDirections/OpTC-data",
+      "published_compressed_size_tb": 1.0,
+      "dates": {"train": ["2019-09-22"], "validation": ["2019-09-23"], "test": ["2019-09-23", "2019-09-24", "2019-09-25"]},
+      "kairos_host_sampling": {
+        "benign_hosts": ["SysClient0201", "SysClient0402", "SysClient0660", "SysClient0501", "SysClient0051", "SysClient0209"],
+        "evaluation_hosts_in_released_notebook": ["SysClient0201", "SysClient0402", "SysClient0660", "SysClient0501", "SysClient0051", "SysClient0207"]
+      },
+      "blocker": "The official release is approximately one terabyte compressed; this 27 GB-free workspace cannot hold it. KAIROS additionally samples six benign hosts for training/validation but tests all hosts."
+    },
+    "uci_messages": {"display_name": "UCI Messages", "status": "survey_only", "prepared_directory": "uci_messages", "benchmark_role": "listed for NETWALK; not evaluated by the state-of-the-art study and not an intrusion corpus"},
+    "digg": {"display_name": "Digg", "status": "survey_only", "prepared_directory": "digg", "benchmark_role": "listed for NETWALK; not evaluated by the state-of-the-art study and not an intrusion corpus"},
+    "arxiv_hep_th": {"display_name": "arXiv hep-th", "status": "survey_only", "prepared_directory": "arxiv_hep_th", "benchmark_role": "listed for NETWALK; not evaluated by the state-of-the-art study and not an intrusion corpus"},
+    "dblp": {"display_name": "DBLP", "status": "survey_only", "prepared_directory": "dblp", "benchmark_role": "listed for NETWALK; not evaluated by the state-of-the-art study and not an intrusion corpus"},
+    "ctu13": {"display_name": "CTU-13", "status": "survey_only", "prepared_directory": "ctu13", "benchmark_role": "listed for ARGA; ARGA was not evaluated by the state-of-the-art study"},
+    "ton_iot": {"display_name": "ToN-IoT", "status": "excluded_by_study", "prepared_directory": "ton_iot", "benchmark_role": "surveyed but explicitly not selected for the state-of-the-art evaluation"},
+    "nf_unsw_nb15_v2": {"display_name": "NF-UNSW-NB15-v2", "status": "excluded_by_study", "prepared_directory": "nf_unsw_nb15_v2", "benchmark_role": "listed for Anomal-E; not used in the state-of-the-art cross-dataset evaluation"},
+    "nf_cse_cic_ids2018_v2": {"display_name": "NF-CSE-CIC-IDS2018-v2", "status": "excluded_by_study", "prepared_directory": "nf_cse_cic_ids2018_v2", "benchmark_role": "listed for Anomal-E; CIC-IDS-2018 was explicitly not selected"},
+    "nf_ton_iot": {"display_name": "NF-ToN-IoT", "status": "excluded_by_study", "prepared_directory": "nf_ton_iot", "benchmark_role": "listed for E-GraphSAGE, which the study did not evaluate because it is supervised"},
+    "bot_iot": {"display_name": "BoT-IoT", "status": "excluded_by_study", "prepared_directory": "bot_iot", "benchmark_role": "surveyed but explicitly not selected for the state-of-the-art evaluation"},
+    "nf_bot_iot": {"display_name": "NF-BoT-IoT", "status": "excluded_by_study", "prepared_directory": "nf_bot_iot", "benchmark_role": "listed for E-GraphSAGE, which the study did not evaluate because it is supervised"},
+    "pivoting": {"display_name": "Pivoting", "status": "survey_only", "prepared_directory": "pivoting", "benchmark_role": "listed for Jbeil; Jbeil could not be reimplemented by the state-of-the-art study"},
+    "cora": {"display_name": "Cora", "status": "survey_only", "prepared_directory": "cora", "benchmark_role": "listed for VGRNN; citation network, not an intrusion corpus"},
+    "citeseer": {"display_name": "Citeseer", "status": "survey_only", "prepared_directory": "citeseer", "benchmark_role": "listed for VGRNN; citation network, not an intrusion corpus"},
+    "pubmed": {"display_name": "Pubmed", "status": "survey_only", "prepared_directory": "pubmed", "benchmark_role": "listed for VGRNN; citation network, not an intrusion corpus"}
+  }
+}
